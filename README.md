@@ -1,2 +1,369 @@
-# Cazik
-Cazik227
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Демо-казино (Только для обучения)</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #1a1e2b, #2d2b4b);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 16px;
+        }
+        .casino-container {
+            background: rgba(20, 25, 40, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 40px;
+            padding: 30px;
+            max-width: 700px;
+            width: 100%;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7), 0 0 0 2px #4a3f1e inset;
+        }
+        h1 {
+            text-align: center;
+            font-size: 3em;
+            margin: 0 0 10px 0;
+            font-weight: 900;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            background: linear-gradient(45deg, #fff6b0, #ffd966);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 15px #ffae00;
+        }
+        .balance-panel {
+            background: #0b0e14;
+            border-radius: 100px;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #f1c40f;
+            margin-bottom: 30px;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .balance-amount {
+            color: #f1c40f;
+            font-size: 2rem;
+            margin-left: 10px;
+            text-shadow: 0 0 8px #ffae00;
+        }
+        .slot-machine {
+            background: #2c2330;
+            border-radius: 30px;
+            padding: 30px;
+            border: 3px solid #b8860b;
+            box-shadow: inset 0 -5px 0 #5a3e0b, 0 10px 20px black;
+        }
+        .reels {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        .reel {
+            background: #f0e6d8;
+            width: 120px;
+            height: 140px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            font-weight: bold;
+            box-shadow: 0 10px 0 #7f5e3a, inset 0 -5px 10px rgba(0,0,0,0.5);
+            border: 3px solid #e0b87b;
+            color: #2c1e0e;
+            transition: all 0.1s ease;
+        }
+        .reel.spinning {
+            opacity: 0.7;
+            transform: scale(0.95);
+            box-shadow: 0 5px 0 #7f5e3a;
+        }
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .bet-input {
+            background: #2d2d3a;
+            border: 2px solid #f1c40f;
+            border-radius: 40px;
+            padding: 12px 20px;
+            color: white;
+            font-size: 1.2rem;
+            width: 120px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .bet-input:focus {
+            outline: none;
+            box-shadow: 0 0 15px gold;
+        }
+        button {
+            background: linear-gradient(145deg, #f1c40f, #d4ac0d);
+            border: none;
+            border-radius: 60px;
+            padding: 15px 35px;
+            font-size: 1.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: #1c1c28;
+            letter-spacing: 2px;
+            cursor: pointer;
+            border-bottom: 5px solid #9e6d0b;
+            transition: 0.07s;
+            box-shadow: 0 7px 0 #7f4f0b, 0 10px 20px black;
+        }
+        button:active {
+            border-bottom-width: 2px;
+            transform: translateY(4px);
+            box-shadow: 0 3px 0 #7f4f0b, 0 10px 20px black;
+        }
+        button:disabled {
+            opacity: 0.5;
+            transform: none;
+            border-bottom-width: 5px;
+            pointer-events: none;
+            filter: grayscale(0.6);
+        }
+        .message-area {
+            background: rgba(0,0,0,0.6);
+            border-radius: 40px;
+            padding: 15px;
+            margin-top: 25px;
+            text-align: center;
+            font-size: 1.3rem;
+            color: #ffdb7c;
+            border: 1px dashed #f1c40f;
+            min-height: 70px;
+            font-weight: bold;
+        }
+        .disclaimer {
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: #aaa;
+            text-align: center;
+            border-top: 1px solid #3d3d5a;
+            padding-top: 15px;
+        }
+        .win-glow {
+            animation: winPulse 0.5s ease;
+        }
+        @keyframes winPulse {
+            0% { box-shadow: 0 0 0 0 gold; }
+            50% { box-shadow: 0 0 30px 20px rgba(255,215,0,0.6); }
+            100% { box-shadow: 0 0 0 0 gold; }
+        }
+    </style>
+</head>
+<body>
+    <div class="casino-container">
+        <h1>💎 GOLDEN SPIN 💎</h1>
+        <div class="balance-panel">
+            <span>💰 Твой баланс (кредиты):</span>
+            <span class="balance-amount" id="balance">1000</span>
+        </div>
+
+        <div class="slot-machine">
+            <div class="reels" id="reels">
+                <div class="reel" id="reel1">🍒</div>
+                <div class="reel" id="reel2">🍒</div>
+                <div class="reel" id="reel3">🍒</div>
+            </div>
+
+            <div class="controls">
+                <label for="bet" style="color: white; font-size: 1.2rem;">Ставка:</label>
+                <input type="number" id="bet" class="bet-input" min="1" max="1000" value="10">
+                <button id="spinBtn">🎰 КРУТИТЬ</button>
+            </div>
+        </div>
+
+        <div class="message-area" id="message">
+            Нажми "КРУТИТЬ", чтобы начать игру
+        </div>
+        <div class="disclaimer">
+            ⚠️ Демо-версия для ознакомления с кодом. Все символические кредиты. Не является настоящим казино. Игра не на реальные деньги.
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ---------- НАСТРОЙКИ (виртуальная валюта) ----------
+            let balance = 1000;  // Стартовый баланс
+            const symbols = ['🍒', '🍋', '🍊', '7️⃣', '💎', '🎰'];
+            // Коэффициенты выигрыша для трёх одинаковых символов
+            const payouts = {
+                '🍒': 5,
+                '🍋': 10,
+                '🍊': 15,
+                '7️⃣': 20,
+                '💎': 50,
+                '🎰': 100
+            };
+
+            // Элементы DOM
+            const balanceEl = document.getElementById('balance');
+            const reel1 = document.getElementById('reel1');
+            const reel2 = document.getElementById('reel2');
+            const reel3 = document.getElementById('reel3');
+            const spinBtn = document.getElementById('spinBtn');
+            const messageEl = document.getElementById('message');
+            const betInput = document.getElementById('bet');
+
+            let isSpinning = false;
+
+            // Обновление отображения баланса
+            function updateBalanceDisplay() {
+                balanceEl.textContent = balance;
+            }
+
+            // Функция для получения случайного символа
+            function getRandomSymbol() {
+                return symbols[Math.floor(Math.random() * symbols.length)];
+            }
+
+            // Рассчёт выигрыша
+            function calculateWin(sym1, sym2, sym3, bet) {
+                if (sym1 === sym2 && sym2 === sym3) {
+                    // Все три одинаковые
+                    const multiplier = payouts[sym1] || 0;
+                    return bet * multiplier;
+                }
+                // Можно добавить частичные комбинации, но для простоты оставим только джекпот при трёх одинаковых
+                return 0;
+            }
+
+            // Анимация прокрутки (без реальной анимации, просто меняем символы несколько раз)
+            function spinReels(callback) {
+                let spinCount = 0;
+                const maxSpins = 10; // Количество смен символов для имитации вращения
+                const interval = 80; // Интервал в мс
+
+                // Добавляем класс анимации
+                reel1.classList.add('spinning');
+                reel2.classList.add('spinning');
+                reel3.classList.add('spinning');
+
+                const spinInterval = setInterval(() => {
+                    // Меняем символы случайными
+                    reel1.textContent = getRandomSymbol();
+                    reel2.textContent = getRandomSymbol();
+                    reel3.textContent = getRandomSymbol();
+                    spinCount++;
+
+                    if (spinCount >= maxSpins) {
+                        clearInterval(spinInterval);
+                        // Убираем класс анимации
+                        reel1.classList.remove('spinning');
+                        reel2.classList.remove('spinning');
+                        reel3.classList.remove('spinning');
+
+                        // Генерируем финальный результат
+                        const final1 = getRandomSymbol();
+                        const final2 = getRandomSymbol();
+                        const final3 = getRandomSymbol();
+
+                        reel1.textContent = final1;
+                        reel2.textContent = final2;
+                        reel3.textContent = final3;
+
+                        // Вызываем колбэк с финальными символами
+                        callback(final1, final2, final3);
+                    }
+                }, interval);
+            }
+
+            // Обработка клика по кнопке Spin
+            function handleSpin() {
+                if (isSpinning) return;
+
+                // Получаем ставку
+                let bet = parseInt(betInput.value, 10);
+                if (isNaN(bet) || bet <= 0) bet = 1;
+                if (bet > balance) bet = balance;  // Нельзя поставить больше, чем есть
+                if (bet > 1000) bet = 1000;        // Ограничим ставку
+
+                betInput.value = bet;  // Обновляем поле
+
+                if (bet <= 0) {
+                    messageEl.textContent = '❌ Недостаточно кредитов для ставки';
+                    return;
+                }
+
+                // Списываем ставку
+                balance -= bet;
+                updateBalanceDisplay();
+
+                // Блокируем кнопку на время вращения
+                isSpinning = true;
+                spinBtn.disabled = true;
+                messageEl.textContent = '🎡 Крутим... Удачи!';
+
+                // Убираем предыдущий эффект выигрыша
+                document.querySelector('.slot-machine').classList.remove('win-glow');
+
+                // Запускаем вращение
+                spinReels((final1, final2, final3) => {
+                    // Рассчёт выигрыша
+                    const winAmount = calculateWin(final1, final2, final3, bet);
+
+                    if (winAmount > 0) {
+                        // Выигрыш!
+                        balance += winAmount;
+                        updateBalanceDisplay();
+                        messageEl.innerHTML = `🎉 ПОБЕДА! +${winAmount} кредитов (комбинация: ${final1}${final2}${final3}) 🎉`;
+                        // Эффект свечения
+                        document.querySelector('.slot-machine').classList.add('win-glow');
+                        setTimeout(() => {
+                            document.querySelector('.slot-machine').classList.remove('win-glow');
+                        }, 600);
+                    } else {
+                        messageEl.textContent = `😞 Повезёт в следующий раз... Выпало: ${final1} ${final2} ${final3}`;
+                    }
+
+                    // Проверка баланса на ноль
+                    if (balance <= 0) {
+                        messageEl.innerHTML = '💔 Баланс на нуле. Обнови страницу для новой демо-игры.';
+                        // Можно разблокировать кнопку, но играть будет не на что.
+                    }
+
+                    // Разблокировка кнопки
+                    isSpinning = false;
+                    spinBtn.disabled = false;
+                });
+            }
+
+            // Вешаем обработчик
+            spinBtn.addEventListener('click', handleSpin);
+
+            // Ограничение ставки (чтобы не вводить отрицательные числа и не превышать баланс)
+            betInput.addEventListener('change', function() {
+                let val = parseInt(this.value, 10);
+                if (isNaN(val) || val < 1) val = 1;
+                if (val > balance) val = balance;
+                if (val > 1000) val = 1000;
+                this.value = val;
+            });
+
+            // Инициализация баланса
+            updateBalanceDisplay();
+        })();
+    </script>
+</body>
+</html>
